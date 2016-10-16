@@ -55,7 +55,7 @@ angular.module('starter', ['ionic', 'ngCordova'])
     console.log("Could not get location");
   });
 }).controller('SearchCtrl',function ($scope){
-
+  console.log("teste");
 }).controller('HomeCtrl',function ($scope){
 
   $scope.linkName = "Search";
