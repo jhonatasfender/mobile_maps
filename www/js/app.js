@@ -40,7 +40,7 @@ angular.module('starter', ['ionic', 'ngCordova'])
     $scope.map = new google.maps.Map(document.getElementById("map"), mapOptions);
     var directionsDisplay = new google.maps.DirectionsRenderer;
     var directionsService = new google.maps.DirectionsService;
-    for (var i = 0; i < 1; ++i) {
+    /*for (var i = 0; i < 1; ++i) {
       var others = new google.maps.Marker({
         position: {
           lat: -15.847113651199606,
@@ -49,7 +49,7 @@ angular.module('starter', ['ionic', 'ngCordova'])
         map: $scope.map
       });
       attachSecretMessage(others, "teste");
-    }
+    }*/
 
     function attachSecretMessage(marker, secretMessage) {
       var infowindow = new google.maps.InfoWindow({
@@ -108,33 +108,6 @@ angular.module('starter', ['ionic', 'ngCordova'])
     console.log("Could not get location");
   });
 })
-/*.controller('MapCtrl',function($scope, $ionicLoading) {
-  
-  console.log("teste");
-  google.maps.event.addDomListener(window, 'load', function() {
-    console.log("teste");
-    var myLatlng = new google.maps.LatLng(37.3000, -120.4833);
-
-    var mapOptions = {
-        center: myLatlng,
-        zoom: 20,
-        mapTypeId: google.maps.MapTypeId.ROADMAP
-    };
-
-    var map = new google.maps.Map(document.getElementById("map"), mapOptions);
-
-    navigator.geolocation.getCurrentPosition(function(pos) {
-        map.setCenter(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
-        var myLocation = new google.maps.Marker({
-            position: new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude),
-            map: map,
-            title: "My Location"
-        });
-    });
-
-    $scope.map = map;
-  });
-})*/
 .controller('SearchCtrl',function ($scope){
   console.log(teste);
   teste = 1;
