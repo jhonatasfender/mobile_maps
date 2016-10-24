@@ -25,12 +25,16 @@ angular.module('starter', ['ionic', 'ngCordova'])
   });  
 })
 .controller('MapCtrl',function($scope, $state, $cordovaGeolocation,$compile) {
-  var options = {timeout: 10000, enableHighAccuracy: true}, divMap = document.getElementById("map"),
+  var options = {timeout: 3000, enableHighAccuracy: true}, divMap = document.getElementById("map"),
   b = document.getElementById("buttonGEO"), w = window,d = document,e = d.documentElement,g = d.getElementsByTagName('body')[0],
     x = w.innerWidth || e.clientWidth || g.clientWidth,
     y = w.innerHeight|| e.clientHeight|| g.clientHeight;
   b.style.marginLeft = (x - 65) + "px";
+  $scope.directionStatus = true;
+  console.log($cordovaGeolocation.getCurrentPosition(options));
   $cordovaGeolocation.getCurrentPosition(options).then(function(position) {
+    var directionsService = new google.maps.DirectionsService;
+    var directionsDisplay = new google.maps.DirectionsRenderer;
     var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
         mapOptions = {
           mapTypeControl: false,
@@ -48,21 +52,30 @@ angular.module('starter', ['ionic', 'ngCordova'])
           ['Maroubra Beach', -15.814717074012279, -48.109130859375   ],
           ['a test'        , -15.834886679274716, -47.986934781074524]
         ], markerOther = [], info = [];
-
-
-    $scope.direct = function (){
-      console.log("teste");
-    };
     $scope.map = new google.maps.Map(divMap, mapOptions);
+    $scope.direct = function (i){
+      var ltlg = markerOther[i].getPosition();
+      directionsDisplay.setMap($scope.map);
+      directionsService.route({
+        origin: latLng,
+        destination: {lat: ltlg.lat(), lng: ltlg.lng()},
+        travelMode: google.maps.TravelMode.DRIVING
+      }, function(response, status) {
+        if (status === google.maps.DirectionsStatus.OK) {
+          directionsDisplay.setDirections(response);
+          $scope.directionStatus = false;
+        } else {
+          window.alert('Directions request failed due to ' + status);
+        }
+      });
+    };
     for (var i = 0; i < beaches.length; i++) {
       markerOther.push(new google.maps.Marker({
-          position : {lat: beaches[i][1], lng: beaches[i][2]},
-          draggable: true,
-          animation: google.maps.Animation.DROP,
-          title    : beaches[i][0]
+        position : {lat: beaches[i][1], lng: beaches[i][2]},
+        animation: google.maps.Animation.DROP,
+        title    : beaches[i][0]
       }));
-
-      var s = "<div>"+beaches[i][0] + " <a ng-click='direct()'>Clique aqui!</a><div>", l = $compile(s)($scope);
+      var s = "<div>"+beaches[i][0] + " <a ng-click='direct(" + i + ")'>Clique aqui!</a><div>", l = $compile(s)($scope);
       info.push(new google.maps.InfoWindow({
         content: l[0]
       }));
@@ -72,28 +85,29 @@ angular.module('starter', ['ionic', 'ngCordova'])
           info[i].open($scope.map, markerOther[i]);
         }
       }(i));
-    }
-    
+    }    
     var directionsDisplay = new google.maps.DirectionsRenderer,directionsService = new google.maps.DirectionsService,
     countZoom = 0,interval,marker = new google.maps.Marker();
     $scope.buttonGEO = function (){
-      marker.setMap(null);
+      marker.setMap(null);      
+      $scope.map.setCenter(latLng);
       countZoom = $scope.map.getZoom();
       interval = window.setInterval(function() {
         if(countZoom >= 10 && countZoom <= 16) { 
-          console.log(countZoom++);
           $scope.map.setZoom(countZoom + 1);
           mapOptions.zomm = countZoom;
         } else {
           clearTimeout(interval);
         }
       }, 500);
-      marker = new google.maps.Marker({
-        map: $scope.map,
-        draggable: true,
-        animation: google.maps.Animation.DROP,
-        position : latLng
-      });
+      if($scope.directionStatus) { 
+        marker = new google.maps.Marker({
+          map: $scope.map,
+          draggable: true,
+          animation: google.maps.Animation.DROP,
+          position : latLng
+        });
+      } 
     };
     google.maps.event.addDomListener($scope.map,'click',function (e){
       console.log(e.latLng.lat());
