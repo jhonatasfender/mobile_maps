@@ -30,34 +30,43 @@ angular.module('starter', ['ionic', 'ngCordova'])
     x = w.innerWidth || e.clientWidth || g.clientWidth,
     y = w.innerHeight|| e.clientHeight|| g.clientHeight;
   b.style.marginLeft = (x - 65) + "px";
+  $scope.teste = function (){
+    console.log("teste");
+  };
   $cordovaGeolocation.getCurrentPosition(options).then(function(position) {
     var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
         mapOptions = {
           mapTypeControl: false,
-          zoomControl: false,
-          scaleControl: false,
-          center: latLng,
-          zoom: 10,
-          mapTypeId: google.maps.MapTypeId.ROADMAP
+          zoomControl   : false,
+          scaleControl  : false,
+          center        : latLng,
+          zoom          : 10,
+          mapTypeId     : google.maps.MapTypeId.ROADMAP
         },
         beaches = [
-          ['Bondi Beach',    -15.831893364540038, -47.885284423828125],
-          ['Coogee Beach',   -15.785646183288632, -47.934722900390625],
-          ['Cronulla Beach', -15.80150355021274,  -47.91412353515625 ],
-          ['Manly Beach',    -15.812074438278657, -48.028106689453125],
-          ['Maroubra Beach', -15.814717074012279, -48.109130859375   ]
+          ['Bondi Beach'   , -15.831893364540038, -47.885284423828125],
+          ['Coogee Beach'  , -15.785646183288632, -47.934722900390625],
+          ['Cronulla Beach', -15.80150355021274 , -47.91412353515625 ],
+          ['Manly Beach'   , -15.812074438278657, -48.028106689453125],
+          ['Maroubra Beach', -15.814717074012279, -48.109130859375   ],
+          ['a test'        , -15.834886679274716, -47.986934781074524]
         ];
     $scope.map = new google.maps.Map(divMap, mapOptions);
     var markerOther = [], info = [];
     for (var i = 0; i < beaches.length; i++) {
       markerOther.push(new google.maps.Marker({
-          position: {lat: beaches[i][1], lng: beaches[i][2]},
+          position : {lat: beaches[i][1], lng: beaches[i][2]},
           draggable: true,
           animation: google.maps.Animation.DROP,
-          title: beaches[i][0]
+          title    : beaches[i][0]
       }));
+      $scope.l = angular.element(beaches[i][0] + " <a ng-click='teste()'>Clique aqui!</a>");
+
+
+      //,c = $compile(l)($scope);
+      console.log($compile(l)($scope));
       info.push(new google.maps.InfoWindow({
-        content: beaches[i][0]
+        content: beaches[i][0] + " <a ng-click='teste()'>Clique aqui!</a>"
       }));
       markerOther[i].setMap($scope.map);
       google.maps.event.addListener(markerOther[i], 'click', function(i) {
@@ -85,7 +94,7 @@ angular.module('starter', ['ionic', 'ngCordova'])
         map: $scope.map,
         draggable: true,
         animation: google.maps.Animation.DROP,
-        position: latLng
+        position : latLng
       });
     };
     google.maps.event.addDomListener($scope.map,'click',function (e){
@@ -112,4 +121,16 @@ angular.module('starter', ['ionic', 'ngCordova'])
   };
   $scope.linkHeard = link;
   link();
+})
+.directive('compileDirective', function ($compile) {
+  return {
+    restrict: 'E',
+    template: '<div>New compile template</div>',
+    controller: 'MapCtrl',
+    link: function (scope, elm, attrs) {
+      var compileIt       = $compile(scope.newElement);
+      var content       = compileIt(scope);
+      elm.append(content);
+    }
+  }
 });
