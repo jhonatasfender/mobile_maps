@@ -24,14 +24,13 @@ angular.module('starter', ['ionic', 'ngCordova'])
     controller: 'SearchCtrl'
   });  
 })
-.controller('MapCtrl',function($scope, $state, $cordovaGeolocation,$compile) {
+.controller('MapCtrl',function($scope, $cordovaGeolocation,$compile,$timeout) {
   var options = {timeout: 3000, enableHighAccuracy: true}, divMap = document.getElementById("map"),
   b = document.getElementById("buttonGEO"), w = window,d = document,e = d.documentElement,g = d.getElementsByTagName('body')[0],
     x = w.innerWidth || e.clientWidth || g.clientWidth,
     y = w.innerHeight|| e.clientHeight|| g.clientHeight;
   b.style.marginLeft = (x - 65) + "px";
   $scope.directionStatus = true;
-  console.log($cordovaGeolocation.getCurrentPosition(options));
   $cordovaGeolocation.getCurrentPosition(options).then(function(position) {
     var directionsService = new google.maps.DirectionsService;
     var directionsDisplay = new google.maps.DirectionsRenderer;
@@ -92,12 +91,12 @@ angular.module('starter', ['ionic', 'ngCordova'])
       marker.setMap(null);      
       $scope.map.setCenter(latLng);
       countZoom = $scope.map.getZoom();
-      interval = window.setInterval(function() {
+      interval = $timeout(function() {
         if(countZoom >= 10 && countZoom <= 16) { 
           $scope.map.setZoom(countZoom + 1);
           mapOptions.zomm = countZoom;
         } else {
-          clearTimeout(interval);
+          $timeout.cancel(interval);
         }
       }, 500);
       if($scope.directionStatus) { 
