@@ -24,15 +24,12 @@ angular.module('starter', ['ionic', 'ngCordova'])
     controller: 'SearchCtrl'
   });  
 })
-.controller('MapCtrl',function($scope, $state, $cordovaGeolocation) {
+.controller('MapCtrl',function($scope, $state, $cordovaGeolocation,$compile) {
   var options = {timeout: 10000, enableHighAccuracy: true}, divMap = document.getElementById("map"),
   b = document.getElementById("buttonGEO"), w = window,d = document,e = d.documentElement,g = d.getElementsByTagName('body')[0],
     x = w.innerWidth || e.clientWidth || g.clientWidth,
     y = w.innerHeight|| e.clientHeight|| g.clientHeight;
   b.style.marginLeft = (x - 65) + "px";
-  $scope.teste = function (){
-    console.log("teste");
-  };
   $cordovaGeolocation.getCurrentPosition(options).then(function(position) {
     var latLng = new google.maps.LatLng(position.coords.latitude, position.coords.longitude),
         mapOptions = {
@@ -50,9 +47,13 @@ angular.module('starter', ['ionic', 'ngCordova'])
           ['Manly Beach'   , -15.812074438278657, -48.028106689453125],
           ['Maroubra Beach', -15.814717074012279, -48.109130859375   ],
           ['a test'        , -15.834886679274716, -47.986934781074524]
-        ];
+        ], markerOther = [], info = [];
+
+
+    $scope.direct = function (){
+      console.log("teste");
+    };
     $scope.map = new google.maps.Map(divMap, mapOptions);
-    var markerOther = [], info = [];
     for (var i = 0; i < beaches.length; i++) {
       markerOther.push(new google.maps.Marker({
           position : {lat: beaches[i][1], lng: beaches[i][2]},
@@ -60,13 +61,10 @@ angular.module('starter', ['ionic', 'ngCordova'])
           animation: google.maps.Animation.DROP,
           title    : beaches[i][0]
       }));
-      $scope.l = angular.element(beaches[i][0] + " <a ng-click='teste()'>Clique aqui!</a>");
 
-
-      //,c = $compile(l)($scope);
-      console.log($compile(l)($scope));
+      var s = "<div>"+beaches[i][0] + " <a ng-click='direct()'>Clique aqui!</a><div>", l = $compile(s)($scope);
       info.push(new google.maps.InfoWindow({
-        content: beaches[i][0] + " <a ng-click='teste()'>Clique aqui!</a>"
+        content: l[0]
       }));
       markerOther[i].setMap($scope.map);
       google.maps.event.addListener(markerOther[i], 'click', function(i) {
@@ -121,16 +119,4 @@ angular.module('starter', ['ionic', 'ngCordova'])
   };
   $scope.linkHeard = link;
   link();
-})
-.directive('compileDirective', function ($compile) {
-  return {
-    restrict: 'E',
-    template: '<div>New compile template</div>',
-    controller: 'MapCtrl',
-    link: function (scope, elm, attrs) {
-      var compileIt       = $compile(scope.newElement);
-      var content       = compileIt(scope);
-      elm.append(content);
-    }
-  }
 });
